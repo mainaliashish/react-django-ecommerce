@@ -1,10 +1,30 @@
+import os
+import random
+import time
 from django.db import models
 from django.contrib.auth.models import User
+
+# Get name and extension of the uploaded file
+
+
+def get_file_extension(file_path):
+    base_name = os.path.basename(file_path)
+    name, ext = os.path.splitext(base_name)
+    return name, ext
+
+# Custom upload file path
+
+def upload_image_path(instance, filename):
+    name, ext = get_file_extension(filename)
+    new_file_name = str(random.randint(1, 99999)) + \
+        str(round(time.time() * 1000))
+    final_file_name = f"{new_file_name}{ext}"
+    return f"products/{final_file_name}"
 
 class Product(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=200, null=True, blank=True, unique=True)
-    # image =
+    image = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
     brand = models.CharField(max_length=200, null=True,
                              blank=True)
     category = models.CharField(
